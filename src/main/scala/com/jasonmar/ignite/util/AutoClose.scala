@@ -50,4 +50,21 @@ object AutoClose {
   def autoClose[A<:AutoCloseable, B](closeable: A)(f: A => B): Try[B] = {
     onComplete(closeable)(_.close())(f)
   }
+
+  /** Useful for CLI applications
+    *
+    */
+  def autoCloseWithShutdownHook[A<:AutoCloseable, B](closeable: A)(f: A => B): Try[B] = {
+    Runtime.getRuntime.addShutdownHook(new Thread(){
+      override def run(): Unit = {
+        try {
+          System.out.println("Closing")
+          closeable.close()
+        } catch {
+          case e: InterruptedException =>
+        }
+      }
+    })
+    onComplete(closeable)(_.close())(f)
+  }
 }
