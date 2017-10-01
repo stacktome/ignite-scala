@@ -34,6 +34,7 @@ object Init {
     val cfg = configs.foldLeft(new IgniteConfiguration()){(cfg, configurator) => configurator(cfg)}
     Ignition.start(cfg)
     implicit val ignite: Ignite = Ignition.ignite()
+    ignite.active(true)
     cacheBuilders.map(_.build())
     ignite
   }

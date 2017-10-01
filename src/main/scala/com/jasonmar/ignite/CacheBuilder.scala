@@ -16,8 +16,6 @@
 
 package com.jasonmar.ignite
 
-import java.util
-
 import com.jasonmar.ignite.config.cache.CacheConfigurator
 import org.apache.ignite.cache.{QueryEntity, QueryIndex}
 import org.apache.ignite.configuration.CacheConfiguration
@@ -51,7 +49,7 @@ trait CacheBuilder[K,V] {
   }
 
   def fieldMap: java.util.LinkedHashMap[String, String] = {
-    val m = new util.LinkedHashMap[String,String]()
+    val m = new java.util.LinkedHashMap[String,String]()
     fields.getOrElse(Seq.empty).foreach{t => m.put(t._1, t._2.getName)}
     m
   }
