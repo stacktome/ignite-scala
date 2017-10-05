@@ -29,13 +29,15 @@ object Init {
     */
   def apply(
     configs: Seq[IgniteConfigurator] = Seq.empty,
-    cacheBuilders: Seq[CacheBuilder[_,_]] = Seq.empty
+    cacheBuilders: Seq[CacheBuilder[_,_]] = Seq.empty,
+    igniteFunction: Option[(Ignite => Unit)] = None
   ): Ignite = {
     val cfg = configs.foldLeft(new IgniteConfiguration()){(cfg, configurator) => configurator(cfg)}
     Ignition.start(cfg)
     implicit val ignite: Ignite = Ignition.ignite()
     ignite.active(true)
     cacheBuilders.map(_.build())
+    igniteFunction.foreach(_.apply(ignite))
     ignite
   }
 }

@@ -20,51 +20,51 @@ import org.apache.ignite.configuration.{PersistentStoreConfiguration, WALMode}
 import org.apache.ignite.internal.processors.cache.persistence.file.FileIOFactory
 
 case class PersistentStoreConfig(
-  setAlwaysWriteFullPages: Option[Boolean] = None,
-  setCheckpointingFrequency: Option[Long] = None,
-  setCheckpointingPageBufferSize: Option[Long] = None,
-  setCheckpointingThreads: Option[Int] = None,
-  setFileIOFactory: Option[FileIOFactory] = None,
-  setLockWaitTime: Option[Long] = None,
-  setMetricsEnabled: Option[Boolean] = None,
-  setPersistentStorePath: Option[String] = None,
-  setRateTimeInterval: Option[Long] = None,
-  setSubIntervals: Option[Int] = None,
-  setTlbSize: Option[Int] = None,
-  setWalArchivePath: Option[String] = None,
-  setWalAutoArchiveAfterInactivity: Option[Long] = None,
-  setWalFlushFrequency: Option[Long] = None,
-  setWalFsyncDelayNanos: Option[Long] = None,
-  setWalHistorySize: Option[Int] = None,
-  setWalMode: Option[WALMode] = None,
-  setWalRecordIteratorBufferSize: Option[Int] = None,
-  setWalSegments: Option[Int] = None,
-  setWalSegmentSize: Option[Int] = None,
-  setWalStorePath: Option[String] = None
+  alwaysWriteFullPages: Option[Boolean] = None,
+  checkpointingFrequency: Option[Long] = None,
+  checkpointingPageBufferSize: Option[Long] = None,
+  checkpointingThreads: Option[Int] = None,
+  fileIOFactory: Option[FileIOFactory] = None,
+  lockWaitTime: Option[Long] = None,
+  metricsEnabled: Option[Boolean] = None,
+  persistentStorePath: Option[String] = None,
+  rateTimeInterval: Option[Long] = None,
+  subIntervals: Option[Int] = None,
+  tlbSize: Option[Int] = None,
+  walArchivePath: Option[String] = None,
+  walAutoArchiveAfterInactivity: Option[Long] = None,
+  walFlushFrequency: Option[Long] = None,
+  walFsyncDelayNanos: Option[Long] = None,
+  walHistorySize: Option[Int] = None,
+  walMode: Option[WALMode] = None,
+  walRecordIteratorBufferSize: Option[Int] = None,
+  walSegments: Option[Int] = None,
+  walSegmentSize: Option[Int] = None,
+  walStorePath: Option[String] = None
 ) {
   def load: PersistentStoreConfiguration = {
     val cfg = new PersistentStoreConfiguration()
-    setAlwaysWriteFullPages.foreach(cfg.setAlwaysWriteFullPages)
-    setCheckpointingFrequency.foreach(cfg.setCheckpointingFrequency)
-    setCheckpointingPageBufferSize.foreach(cfg.setCheckpointingPageBufferSize)
-    setCheckpointingThreads.foreach(cfg.setCheckpointingThreads)
-    setFileIOFactory.foreach(cfg.setFileIOFactory)
-    setLockWaitTime.foreach(cfg.setLockWaitTime)
-    setMetricsEnabled.foreach(cfg.setMetricsEnabled)
-    setPersistentStorePath.foreach(cfg.setPersistentStorePath)
-    setRateTimeInterval.foreach(cfg.setRateTimeInterval)
-    setSubIntervals.foreach(cfg.setSubIntervals)
-    setTlbSize.foreach(cfg.setTlbSize)
-    setWalArchivePath.foreach(cfg.setWalArchivePath)
-    setWalAutoArchiveAfterInactivity.foreach(cfg.setWalAutoArchiveAfterInactivity)
-    setWalFlushFrequency.foreach(cfg.setWalFlushFrequency)
-    setWalFsyncDelayNanos.foreach(cfg.setWalFsyncDelayNanos)
-    setWalHistorySize.foreach(cfg.setWalHistorySize)
-    setWalMode.foreach(cfg.setWalMode)
-    setWalRecordIteratorBufferSize.foreach(cfg.setWalRecordIteratorBufferSize)
-    setWalSegments.foreach(cfg.setWalSegments)
-    setWalSegmentSize.foreach(cfg.setWalSegmentSize)
-    setWalStorePath.foreach(cfg.setWalStorePath)
+    alwaysWriteFullPages.foreach(cfg.setAlwaysWriteFullPages)
+    checkpointingFrequency.foreach(cfg.setCheckpointingFrequency)
+    checkpointingPageBufferSize.foreach(cfg.setCheckpointingPageBufferSize)
+    checkpointingThreads.foreach(cfg.setCheckpointingThreads)
+    fileIOFactory.foreach(cfg.setFileIOFactory)
+    lockWaitTime.foreach(cfg.setLockWaitTime)
+    metricsEnabled.foreach(cfg.setMetricsEnabled)
+    persistentStorePath.foreach(cfg.setPersistentStorePath)
+    rateTimeInterval.foreach(cfg.setRateTimeInterval)
+    subIntervals.foreach(cfg.setSubIntervals)
+    tlbSize.foreach(cfg.setTlbSize)
+    walArchivePath.foreach(cfg.setWalArchivePath)
+    walAutoArchiveAfterInactivity.foreach(cfg.setWalAutoArchiveAfterInactivity)
+    walFlushFrequency.foreach(cfg.setWalFlushFrequency)
+    walFsyncDelayNanos.foreach(cfg.setWalFsyncDelayNanos)
+    walHistorySize.foreach(cfg.setWalHistorySize)
+    walMode.foreach(cfg.setWalMode)
+    walRecordIteratorBufferSize.foreach(cfg.setWalRecordIteratorBufferSize)
+    walSegments.foreach(cfg.setWalSegments)
+    walSegmentSize.foreach(cfg.setWalSegmentSize)
+    walStorePath.foreach(cfg.setWalStorePath)
     cfg
   }
 }
