@@ -25,8 +25,9 @@ trait IgniteApp extends IgniteFunction {
   val cacheBuilders: Seq[CacheBuilder[_,_]] = Seq.empty
 
   def main(args: Array[String]): Unit = {
+    val activate = args.toSet.contains("--activate")
     System.out.println(s"Initializing Ignite")
-    exec(igniteConfigs, cacheBuilders, Some(igniteFunction))
+    exec(igniteConfigs, cacheBuilders, Some(igniteFunction), activate)
     System.out.println("Finished")
     System.exit(0)
   }

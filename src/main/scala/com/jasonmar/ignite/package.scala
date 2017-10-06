@@ -52,21 +52,15 @@ package object ignite {
   def exec(
     configs: Seq[IgniteConfigurator] = Seq.empty,
     cacheBuilders: Seq[CacheBuilder[_,_]] = Seq.empty,
-    igniteFunction: Option[(Ignite => Unit)] = None
+    igniteFunction: Option[(Ignite => Unit)] = None,
+    activate: Boolean = false
   ): Unit = {
-    val cfg = {
-      if (configs.nonEmpty){
-        configs.foldLeft(new IgniteConfiguration()){(cfg, configurator) => configurator(cfg)}
-      } else {
-        new IgniteConfiguration()
-      }
-    }
+    val cfg = configs.foldLeft(new IgniteConfiguration()){(cfg, configurator) => configurator(cfg)}
     autoCloseWithShutdownHook(Ignition.start(cfg)) { ignite =>
-      cacheBuilders.map(_.cacheConfiguration) match {
-        case cacheConfigurations if cacheConfigurations.nonEmpty =>
-          ignite.createCaches(cacheConfigurations.asJavaCollection)
-        case _ =>
-      }
+      activateCluster(ignite, activate)
+      Option(cacheBuilders.map(_.cacheConfiguration))
+        .filter(_.nonEmpty)
+        .foreach{cfgs => ignite.getOrCreateCaches(cfgs.asJavaCollection)}
       igniteFunction.foreach(_.apply(ignite))
     } match {
       case Failure(e) =>
@@ -76,10 +70,28 @@ package object ignite {
     }
   }
 
+  def activateCluster(ignite: Ignite, activate: Boolean = true): Unit = {
+    if (!ignite.active()){
+      ignite.log().warning("Ignite cluster is not active")
+      if (activate){
+        ignite.log().info("Activating Ignite cluster")
+        ignite.active(true)
+        if (ignite.active()){
+          ignite.log().info("Ignite cluster is active")
+        } else {
+          ignite.log().error("Failed to activate Ignite cluster")
+        }
+      }
+    } else {
+      ignite.log().info("Ignite cluster is active")
+    }
+  }
+
   def init(
     configs: Option[Seq[IgniteConfigurator]] = None,
     cacheBuilders: Option[Seq[CacheBuilder[_,_]]] = None,
-    igniteFunction: Option[(Ignite => Unit)] = None
+    igniteFunction: Option[(Ignite => Unit)] = None,
+    activate: Boolean = false
   ): Ignite = {
     // Generate IgniteConfiguration
     val cfg = configs.filter(_.nonEmpty)
@@ -88,6 +100,7 @@ package object ignite {
 
     // Start Ignite instance
     val ignite = Ignition.start(cfg)
+    activateCluster(ignite, activate)
 
     // Create IgniteCaches
     cacheBuilders.filter(_.nonEmpty)

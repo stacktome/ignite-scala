@@ -52,6 +52,10 @@ object IgniteClientConfig {
         .action((x, c) => c.copy(servers = Some(x)))
         .text("servers to include")
 
+      opt[Unit]("activate")
+        .action((_, c) => c.copy(activate = true))
+        .text("activate is an optional flag")
+
       help("help").text("prints this usage text")
 
       note("some notes.")
@@ -72,7 +76,8 @@ case class IgniteClientConfig(
   workDirectory: String = "/tmp/ignite_client",
   servers: Option[Seq[String]] = None,
   peerClassLoadingEnabled: Boolean = false,
-  metricsFrequency: Int = 0
+  metricsFrequency: Int = 0,
+  activate: Boolean = false
 ) extends IgniteConfigurator {
   val igniteConfigs: Seq[IgniteConfigurator] = {
     Seq[IgniteConfigurator](

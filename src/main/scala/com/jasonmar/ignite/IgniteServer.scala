@@ -26,7 +26,7 @@ trait IgniteServer {
   val igniteFunction: Option[(Ignite) => Unit]
   def main(args: Array[String]): Unit = {
     IgniteServerConfig.parse(args).foreach{cfg =>
-      init(configs = Some(cfg.igniteConfigs), igniteFunction = igniteFunction)
+      init(configs = Some(cfg.igniteConfigs), igniteFunction = igniteFunction, activate = cfg.activate)
     }
   }
 }

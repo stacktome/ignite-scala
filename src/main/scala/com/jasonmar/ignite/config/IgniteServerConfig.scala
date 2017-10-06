@@ -72,6 +72,10 @@ object IgniteServerConfig {
         .action((x, c) => c.copy(memMaxSizeGb = x * 1024L * 1024L * 1024L))
         .text("memMaxSize is an optional integer property")
 
+      opt[Unit]("activate")
+        .action((_, c) => c.copy(activate = true))
+        .text("activate is an optional flag")
+
       help("help").text("prints this usage text")
 
       note("some notes.")
@@ -97,6 +101,7 @@ object IgniteServerConfig {
   * @param walFlushFrequency default 10000, lower if using SSD or NVMe; only takes effect if persistentStoreEnabled is set to true
   * @param checkpointingFrequency default 540000 (9 minutes), lower if using SSD or NVMe; only takes effect if persistentStoreEnabled is set to true
   * @param walFsyncDelayNanos default 10000 (10 milliseconds), lower if using SSD or NVMe; only takes effect if persistentStoreEnabled is set to true
+  * @param activate default false, whether to activate the cluster immediately
   */
 case class IgniteServerConfig(
   bindAddress: String = "127.0.0.1",
@@ -114,7 +119,8 @@ case class IgniteServerConfig(
   persistentStoreEnabled: Boolean = true,
   walFlushFrequency: Int = PersistentStoreConfiguration.DFLT_WAL_FLUSH_FREQ * 5,
   checkpointingFrequency: Int = PersistentStoreConfiguration.DFLT_CHECKPOINTING_FREQ * 3,
-  walFsyncDelayNanos: Int = PersistentStoreConfiguration.DFLT_WAL_FSYNC_DELAY * 10
+  walFsyncDelayNanos: Int = PersistentStoreConfiguration.DFLT_WAL_FSYNC_DELAY * 10,
+  activate: Boolean = false
 ) extends IgniteConfigurator {
   val igniteConfigs: Seq[IgniteConfigurator] = Seq[IgniteConfigurator](
     GridConfig(
