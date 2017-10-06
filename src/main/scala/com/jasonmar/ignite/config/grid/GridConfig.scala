@@ -19,6 +19,7 @@ package com.jasonmar.ignite.config.grid
 import java.io.Serializable
 import java.util.UUID
 
+import com.jasonmar.ignite.IgniteConfigurator
 import org.apache.ignite.configuration._
 import org.apache.ignite.events.Event
 import org.apache.ignite.lang.{IgniteInClosure, IgnitePredicate}

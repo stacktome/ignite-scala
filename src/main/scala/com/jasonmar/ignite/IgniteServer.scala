@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package com.jasonmar.ignite.app
+package com.jasonmar.ignite
 
-import com.jasonmar.ignite.Init
-import com.jasonmar.ignite.util.AutoClose.autoCloseWithShutdownHook
-import org.apache.ignite.Ignition
+import com.jasonmar.ignite.config.IgniteServerConfig
+import org.apache.ignite.Ignite
 
-/** Used to create Ignite CLI applications
+/** CLI template trait
+  * Builds a fully functional Ignite server node configured via command line options
   */
-trait IgniteApp extends IgniteFunction with IgniteInit {
+trait IgniteServer {
+  val igniteFunction: Option[(Ignite) => Unit]
   def main(args: Array[String]): Unit = {
-    System.out.println(s"Initializing Ignite")
-    Init(configs = igniteConfigs, cacheBuilders = cacheBuilders)
-    autoCloseWithShutdownHook(Ignition.ignite()) {igniteFunction}
-    System.out.println("exiting")
-    System.exit(0)
+    IgniteServerConfig.parse(args).foreach{cfg =>
+      init(configs = Some(cfg.igniteConfigs), igniteFunction = igniteFunction)
+    }
   }
 }

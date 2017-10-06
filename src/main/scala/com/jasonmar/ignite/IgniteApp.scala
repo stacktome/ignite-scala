@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package com.jasonmar.ignite.app
+package com.jasonmar.ignite
 
-import com.jasonmar.ignite.CacheBuilder
-import com.jasonmar.ignite.config.grid.IgniteConfigurator
-
-trait IgniteInit {
+/** CLI template trait
+  * Creates a parameter-less Ignite CLI applications
+  * Useful for creating caches
+  */
+trait IgniteApp extends IgniteFunction {
   val igniteConfigs: Seq[IgniteConfigurator] = Seq.empty
   val cacheBuilders: Seq[CacheBuilder[_,_]] = Seq.empty
+
+  def main(args: Array[String]): Unit = {
+    System.out.println(s"Initializing Ignite")
+    exec(igniteConfigs, cacheBuilders, Some(igniteFunction))
+    System.out.println("Finished")
+    System.exit(0)
+  }
 }

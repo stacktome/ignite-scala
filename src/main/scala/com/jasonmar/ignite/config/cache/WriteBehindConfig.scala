@@ -16,6 +16,7 @@
 
 package com.jasonmar.ignite.config.cache
 
+import com.jasonmar.ignite.CacheConfigurator
 import org.apache.ignite.configuration.CacheConfiguration
 
 case class WriteBehindConfig[K,V](

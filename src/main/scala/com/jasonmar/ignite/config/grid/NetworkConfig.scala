@@ -19,6 +19,7 @@ package com.jasonmar.ignite.config.grid
 import javax.cache.configuration.Factory
 import javax.net.ssl.SSLContext
 
+import com.jasonmar.ignite.IgniteConfigurator
 import org.apache.ignite.configuration.{AddressResolver, IgniteConfiguration}
 import org.apache.ignite.plugin.segmentation.{SegmentationPolicy, SegmentationResolver}
 

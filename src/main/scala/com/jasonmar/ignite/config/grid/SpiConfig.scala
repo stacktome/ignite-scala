@@ -16,6 +16,7 @@
 
 package com.jasonmar.ignite.config.grid
 
+import com.jasonmar.ignite.IgniteConfigurator
 import org.apache.ignite.configuration.IgniteConfiguration
 import org.apache.ignite.spi.checkpoint.CheckpointSpi
 import org.apache.ignite.spi.collision.CollisionSpi

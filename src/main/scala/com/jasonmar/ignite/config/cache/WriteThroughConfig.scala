@@ -19,6 +19,7 @@ package com.jasonmar.ignite.config.cache
 import javax.cache.configuration.Factory
 import javax.cache.integration.CacheWriter
 
+import com.jasonmar.ignite.CacheConfigurator
 import org.apache.ignite.configuration.CacheConfiguration
 
 case class WriteThroughConfig[K,V](

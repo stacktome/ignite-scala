@@ -18,6 +18,7 @@ package com.jasonmar.ignite.config.cache
 
 import javax.cache.configuration.Factory
 
+import com.jasonmar.ignite.CacheConfigurator
 import org.apache.ignite.cache.store.{CacheStore, CacheStoreSessionListener}
 import org.apache.ignite.configuration.CacheConfiguration
 

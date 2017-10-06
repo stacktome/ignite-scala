@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.jasonmar.ignite.app
+package com.jasonmar.ignite
 
 import org.apache.ignite.Ignite
 
-trait IgniteFunction {
-  val igniteFunction: (Ignite) => Unit
+object Client extends IgniteClient {
+  override val igniteFunction: (Ignite) => Unit = {ignite =>
+    ignite.log().info(s"Started ignite node (${ignite.configuration().getLocalHost})")
+  }
 }

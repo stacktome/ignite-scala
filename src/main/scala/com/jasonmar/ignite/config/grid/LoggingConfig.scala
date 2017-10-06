@@ -18,6 +18,7 @@ package com.jasonmar.ignite.config.grid
 
 import javax.management.MBeanServer
 
+import com.jasonmar.ignite.IgniteConfigurator
 import org.apache.ignite.IgniteLogger
 import org.apache.ignite.configuration.IgniteConfiguration
 import org.apache.ignite.lifecycle.LifecycleBean

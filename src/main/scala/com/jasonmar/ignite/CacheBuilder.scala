@@ -16,10 +16,8 @@
 
 package com.jasonmar.ignite
 
-import com.jasonmar.ignite.config.cache.CacheConfigurator
 import org.apache.ignite.cache.{QueryEntity, QueryIndex}
 import org.apache.ignite.configuration.CacheConfiguration
-import org.apache.ignite.{Ignite, IgniteCache}
 
 import scala.collection.JavaConverters.asJavaCollectionConverter
 
@@ -31,11 +29,6 @@ trait CacheBuilder[K,V] {
   val fields: Option[Seq[(String, Class[_])]] = None
   val cfgs: Seq[CacheConfigurator[K,V]] = Seq.empty
 
-  def build()(implicit ignite: Ignite): IgniteCache[K,V] = {
-    val cfg = cacheConfiguration.setName(name)
-    ignite.getOrCreateCache(cfg)
-  }
-
   def cacheConfiguration: CacheConfiguration[K,V] = {
     val cfg = new CacheConfiguration[K,V]()
     indexFields.foreach{x => cfg.setIndexedTypes(x.map(_._2).distinct:_*)}
@@ -44,17 +37,17 @@ trait CacheBuilder[K,V] {
     cfgs.foldLeft(cfg){(cfg,subCfg) => subCfg(cfg)}
   }
 
-  def queryIndex: java.util.Collection[QueryIndex] = {
+  protected def queryIndex: java.util.Collection[QueryIndex] = {
     indexFields.getOrElse(Seq.empty).map(t => new QueryIndex(t._1)).asJavaCollection
   }
 
-  def fieldMap: java.util.LinkedHashMap[String, String] = {
+  protected def fieldMap: java.util.LinkedHashMap[String, String] = {
     val m = new java.util.LinkedHashMap[String,String]()
     fields.getOrElse(Seq.empty).foreach{t => m.put(t._1, t._2.getName)}
     m
   }
 
-  def queryEntities: java.util.Collection[QueryEntity] = {
+  protected def queryEntities: java.util.Collection[QueryEntity] = {
     val q = new QueryEntity()
     q.setKeyType(keyClass.getName)
     q.setValueType(valueClass.getName)

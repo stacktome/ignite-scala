@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-package com.jasonmar.ignite.config.cache
+package com.jasonmar.ignite
 
-import org.apache.ignite.configuration.CacheConfiguration
+import com.jasonmar.ignite.config.IgniteClientConfig
 
-trait CacheConfigurator[K,V] {
-  def apply(cfg: CacheConfiguration[K,V]): CacheConfiguration[K,V]
+/** CLI template trait
+  * Builds a fully functional Ignite client node configured via command line options
+  */
+trait IgniteClient extends IgniteFunction {
+  def main(args: Array[String]): Unit = {
+    IgniteClientConfig.parse(args).foreach{cfg =>
+      exec(configs = cfg.igniteConfigs, igniteFunction = Some(igniteFunction))
+    }
+  }
 }

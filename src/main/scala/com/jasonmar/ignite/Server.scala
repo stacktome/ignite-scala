@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.jasonmar.ignite.config.grid
+package com.jasonmar.ignite
 
-import org.apache.ignite.configuration.IgniteConfiguration
+import org.apache.ignite.Ignite
 
-trait IgniteConfigurator {
-  def apply(cfg: IgniteConfiguration): IgniteConfiguration
+object Server extends IgniteServer {
+  override val igniteFunction: Option[(Ignite) => Unit] = Some{ignite =>
+    ignite.log().info(s"Started ignite node (${ignite.configuration().getLocalHost})")
+  }
 }

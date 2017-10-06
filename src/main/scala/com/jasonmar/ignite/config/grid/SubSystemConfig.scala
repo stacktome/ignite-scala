@@ -16,6 +16,7 @@
 
 package com.jasonmar.ignite.config.grid
 
+import com.jasonmar.ignite.IgniteConfigurator
 import org.apache.ignite.cache.CacheKeyConfiguration
 import org.apache.ignite.configuration._
 import org.apache.ignite.plugin.PluginConfiguration

@@ -16,6 +16,7 @@
 
 package com.jasonmar.ignite.config.cache
 
+import com.jasonmar.ignite.CacheConfigurator
 import org.apache.ignite.cache.{CacheRebalanceMode, CacheWriteSynchronizationMode, PartitionLossPolicy}
 import org.apache.ignite.cluster.ClusterNode
 import org.apache.ignite.configuration.CacheConfiguration
