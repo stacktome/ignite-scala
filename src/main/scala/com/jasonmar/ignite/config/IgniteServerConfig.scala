@@ -31,11 +31,31 @@ object IgniteServerConfig {
     new scopt.OptionParser[IgniteServerConfig]("ignite") {
       head("ignite", "2.2")
 
+      opt[String]('n', "name")
+        .valueName("<name>")
+        .action((x, c) => c.copy(name = Some(x)))
+        .text("name is an optional string property")
+
       opt[String]('b', "bindAddress")
         .required()
         .valueName("<bindAddress>")
         .action((x, c) => c.copy(bindAddress = x))
         .text("bindAddress is an optional string property")
+
+      opt[Int]('c', "commsPort")
+        .valueName("<commsPort>")
+        .action((x, c) => c.copy(commsPort = Some(x)))
+        .text("commsPort is an optional integer property")
+
+      opt[Int]('d', "discoveryPort")
+        .valueName("<discoveryPort>")
+        .action((x, c) => c.copy(discoveryPort = Some(x)))
+        .text("discoveryPort is an optional integer property")
+
+      opt[Int]('r', "portRange")
+        .valueName("<portRange>")
+        .action((x, c) => c.copy(portRange = Some(x)))
+        .text("portRange is an optional integer property")
 
       opt[Seq[String]]('s', "servers")
         .valueName("<ip1>,<ip2>...")
@@ -85,7 +105,11 @@ object IgniteServerConfig {
 
 /** Ignite config with defaults closer to production than shipped with Ignite
   *
+  * @param name defaults to naming based on IP address
   * @param bindAddress default 127.0.0.1
+  * @param commsPort default 47100
+  * @param discoveryPort default 47500
+  * @param portRange default 0
   * @param servers sequence of ip or ip:port for cluster nodes
   * @param deploymentUris examples: file://freq=2000@localhost/var/ignite/deployment http://freq=60000@127.0.0.1:8080
   * @param userAttributes set attributes for this node which can be used for targeting compute tasks
@@ -104,7 +128,11 @@ object IgniteServerConfig {
   * @param activate default false, whether to activate the cluster immediately
   */
 case class IgniteServerConfig(
+  name: Option[String] = None,
   bindAddress: String = "127.0.0.1",
+  commsPort: Option[Int] = None,
+  discoveryPort: Option[Int] = None,
+  portRange: Option[Int] = None,
   servers: Option[Seq[String]] = None,
   deploymentUris: Seq[String] = Seq(),
   userAttributes: Option[Map[String,String]] = None,
@@ -145,27 +173,15 @@ case class IgniteServerConfig(
         }
       },
       memoryConfiguration = Some(
-        new MemoryConfiguration()
-          .setMemoryPolicies(
-            new MemoryPolicyConfiguration()
-              .setInitialSize(MemoryConfiguration.DFLT_MEMORY_POLICY_INITIAL_SIZE * 10L) // 2g
-              .setMaxSize(memMaxSizeGb) // 20g
-              .setMetricsEnabled(false)
-              .setName("20g")
-          )
-      )
-    ),
-    SpiConfig(
-      discoverySpi = Some(
-        servers.filter(_.nonEmpty).map{s =>
-          new TcpDiscoverySpi()
-            .setIpFinder(new TcpDiscoveryVmIpFinder().setAddresses(s.asJavaCollection))
-        }.getOrElse(
-          new TcpDiscoverySpi()
-            .setIpFinder(new TcpDiscoveryMulticastIpFinder().setLocalAddress(bindAddress))
+        new MemoryConfiguration().setMemoryPolicies(
+          new MemoryPolicyConfiguration()
+            .setInitialSize(MemoryConfiguration.DFLT_MEMORY_POLICY_INITIAL_SIZE * 10L) // 2g
+            .setMaxSize(memMaxSizeGb)
+            .setMetricsEnabled(false)
         )
       )
     ),
+    networkSpi(name, bindAddress, servers, commsPort, discoveryPort, portRange),
     ThreadPoolConfig(
       dataStreamerThreadPoolSize = Some(dataStreamerThreadPoolSize), // default 8
       asyncCallbackPoolSize = Some(asyncCallbackPoolSize), // default 8
