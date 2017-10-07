@@ -4,47 +4,63 @@ import javax.cache.Cache
 
 import com.jasonmar.ignite.util.AutoClose
 import org.apache.ignite.IgniteCache
-import org.apache.ignite.cache.query.{FieldsQueryCursor, QueryCursor, SqlQuery}
+import org.apache.ignite.cache.query.{FieldsQueryCursor, QueryCursor, SqlFieldsQuery, SqlQuery}
 
-import scala.util.Try
 import scala.collection.JavaConverters._
 
 package object sql {
 
-  def getAllQ[K,V](cache: IgniteCache[K,V], valueClass: Class[_], q: String): Option[Iterator[(K,V)]] = {
-    AutoClose.autoClose(cache.query(new SqlQuery(valueClass, q)))(getAll[K,V]).toOption
+  def sqlQuery[K,V](cache: IgniteCache[K,V], valueClass: Class[_], q: String): Option[Iterator[(K,V)]] = {
+    AutoClose.autoClose(cache.query(new SqlQuery(valueClass, q)))(getEntries[K,V]).toOption
   }
 
-  def getOneQ[K,V](cache: IgniteCache[K,V], valueClass: Class[_], q: String): Option[(K,V)] = {
-    AutoClose.autoClose(cache.query(new SqlQuery(valueClass, q)))(getOne[K,V]).toOption.flatten
-  }
-
-  def getOne[K,V](cursor: QueryCursor[Cache.Entry[Nothing,Nothing]]): Option[(K,V)] = {
-    Try{
-      val x = cursor.iterator().next()
-      (x.getKey.asInstanceOf[K],x.getValue.asInstanceOf[V])
-    }.toOption
-  }
-
-  def getAll[K,V](cursor: QueryCursor[Cache.Entry[Nothing,Nothing]]): Iterator[(K,V)] = {
+  def getEntries[K,V](cursor: QueryCursor[Cache.Entry[Nothing,Nothing]]): Iterator[(K,V)] = {
     cursor.iterator().asScala.map{x =>
       (x.getKey.asInstanceOf[K], x.getValue.asInstanceOf[V])
     }
   }
 
-  def getCol[T](cursor: FieldsQueryCursor[java.util.List[_]]): Option[Iterator[T]] = {
-    val it = cursor
-      .iterator()
-      .asScala
-      .map{_.get(0).asInstanceOf[T]}
-    if (it.hasNext) Some(it)
-    else None
+  def sqlFieldsQuery[T](cache: IgniteCache[_,_], q: String): Option[Iterator[T]] = {
+    AutoClose.autoClose(cache.query(new SqlFieldsQuery(q)))(getCol[T]).toOption
   }
 
-  def getCols[T1,T2](cursor: FieldsQueryCursor[java.util.List[_]]): Option[Iterator[(T1,T2)]] = {
-    val it = cursor.iterator().asScala.map{t => (t.get(0).asInstanceOf[T1], t.get(1).asInstanceOf[T2])}
-    if (it.hasNext) Some(it)
-    else None
+  def sqlFieldsQuery2[T1,T2](cache: IgniteCache[_,_], q: String): Option[Iterator[(T1,T2)]] = {
+    AutoClose.autoClose(cache.query(new SqlFieldsQuery(q)))(getCols[T1,T2]).toOption
+  }
+
+  def sqlFieldsQuery3[T1,T2,T3](cache: IgniteCache[_,_], q: String): Option[Iterator[(T1,T2,T3)]] = {
+    AutoClose.autoClose(cache.query(new SqlFieldsQuery(q)))(getCols3[T1,T2,T3]).toOption
+  }
+
+  def sqlFieldsQuery4[T1,T2,T3,T4](cache: IgniteCache[_,_], q: String): Option[Iterator[(T1,T2,T3,T4)]] = {
+    AutoClose.autoClose(cache.query(new SqlFieldsQuery(q)))(getCols4[T1,T2,T3,T4]).toOption
+  }
+
+  def getCol[T](cursor: FieldsQueryCursor[java.util.List[_]]): Iterator[T] = {
+    cursor.iterator().asScala.map{_.get(0).asInstanceOf[T]}
+  }
+
+  def getCols[T1,T2](cursor: FieldsQueryCursor[java.util.List[_]]): Iterator[(T1,T2)] = {
+    cursor.iterator().asScala.map{t =>
+      (t.get(0).asInstanceOf[T1], t.get(1).asInstanceOf[T2])
+    }
+  }
+
+  def getCols3[T1,T2,T3](cursor: FieldsQueryCursor[java.util.List[_]]): Iterator[(T1,T2,T3)] = {
+    cursor.iterator().asScala.map{t =>
+      (t.get(0).asInstanceOf[T1], t.get(1).asInstanceOf[T2], t.get(2).asInstanceOf[T3])
+    }
+  }
+
+  def getCols4[T1,T2,T3,T4](cursor: FieldsQueryCursor[java.util.List[_]]): Iterator[(T1,T2,T3,T4)] = {
+    cursor.iterator().asScala.map{t =>
+      (
+        t.get(0).asInstanceOf[T1],
+        t.get(1).asInstanceOf[T2],
+        t.get(2).asInstanceOf[T3],
+        t.get(3).asInstanceOf[T4]
+      )
+    }
   }
 
 }
