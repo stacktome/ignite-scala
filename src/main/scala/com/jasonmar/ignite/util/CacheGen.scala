@@ -10,13 +10,17 @@ import org.apache.ignite.configuration.CacheConfiguration
   * @tparam V value class type
   */
 case class CacheGen[V](typeName: String, typeClass: Class[V]) {
+
+  val idCacheName: String = typeName + "Id"
+  val revCacheName: String = typeName + "Name"
+
   /** Get Id by Name
     */
-  def idCache: CacheBuilder[String,Long] = CacheBuilder.ofIds(typeName + "Ids")
+  def idCache: CacheBuilder[String,Long] = CacheBuilder.ofIds(idCacheName)
 
   /** Get Name by Id
     */
-  def revCache: CacheBuilder[Long,String] = CacheBuilder.ofNames(typeName + "Names")
+  def revCache: CacheBuilder[Long,String] = CacheBuilder.ofNames(revCacheName)
 
   /** Retrieves value type by Id
     */
