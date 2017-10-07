@@ -19,11 +19,6 @@ package com.jasonmar.ignite.config
 import com.jasonmar.ignite.IgniteConfigurator
 import com.jasonmar.ignite.config.grid._
 import org.apache.ignite.configuration.{IgniteConfiguration, MemoryConfiguration, MemoryPolicyConfiguration, PersistentStoreConfiguration}
-import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi
-import org.apache.ignite.spi.discovery.tcp.ipfinder.multicast.TcpDiscoveryMulticastIpFinder
-import org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder
-
-import scala.collection.JavaConverters.asJavaCollectionConverter
 
 object IgniteServerConfig {
   def parse(args: Array[String]): Option[IgniteServerConfig] = parser.parse(args, IgniteServerConfig())

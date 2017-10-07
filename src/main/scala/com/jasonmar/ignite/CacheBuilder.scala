@@ -21,6 +21,37 @@ import org.apache.ignite.configuration.CacheConfiguration
 
 import scala.collection.JavaConverters.asJavaCollectionConverter
 
+object CacheBuilder {
+  def builderOf[K,V](cacheName: String, keyCls: Class[K], valueCls: Class[V]): CacheBuilder[K,V] = {
+    new CacheBuilder[K,V] {
+      override val name: String = name
+      override val keyClass: Class[_] = keyCls
+      override val valueClass: Class[_] = valueCls
+    }
+  }
+
+  /** Generates a CacheBuilder which stores numeric ids for a set of strings
+    * The numeric id is used in all other caches
+    */
+  def ofIds(cacheName: String): CacheBuilder[String,Long] = {
+    builderOf(cacheName, classOf[String], classOf[Long])
+  }
+
+  /** Generates a CacheBuilder which stores names for a set of ids
+    * Used as a reverse lookup by id
+    */
+  def ofNames(cacheName: String): CacheBuilder[Long,String] = {
+    builderOf(cacheName, classOf[Long], classOf[String])
+  }
+
+  /** Builds a cache for a value type
+    * Keyed by a numeric id
+    */
+  def ofClass[V](cacheName: String, valueClass: Class[V]): CacheBuilder[Long,V] = {
+    builderOf(cacheName, classOf[Long], valueClass)
+  }
+}
+
 trait CacheBuilder[K,V] {
   val name: String
   val keyClass: Class[_]
