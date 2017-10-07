@@ -63,6 +63,7 @@ trait CacheBuilder[K,V] {
   def cacheConfiguration: CacheConfiguration[K,V] = {
     val cfg = new CacheConfiguration[K,V]()
     cfg.setName(name)
+    cfg.setEagerTtl(false)
     indexFields.foreach{x => cfg.setIndexedTypes(x.map(_._2).distinct:_*)}
 
     cfg.setQueryEntities(queryEntities)
