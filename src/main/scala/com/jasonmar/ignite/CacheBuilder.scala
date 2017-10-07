@@ -24,7 +24,7 @@ import scala.collection.JavaConverters.asJavaCollectionConverter
 object CacheBuilder {
   def builderOf[K,V](cacheName: String, keyCls: Class[K], valueCls: Class[V]): CacheBuilder[K,V] = {
     new CacheBuilder[K,V] {
-      override val name: String = name
+      override val name: String = cacheName
       override val keyClass: Class[_] = keyCls
       override val valueClass: Class[_] = valueCls
     }
