@@ -2,7 +2,7 @@ name := "ignite-scala"
 
 organization := "com.jasonmar"
 
-version := "1.6.9"
+version := "1.7.0"
 
 scalaVersion := "2.11.11"
 
