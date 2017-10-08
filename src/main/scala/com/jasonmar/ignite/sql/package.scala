@@ -11,13 +11,12 @@ import scala.collection.JavaConverters._
 package object sql {
 
   def sqlQuery[K,V](cache: IgniteCache[K,V], valueClass: Class[_], q: String): Option[Iterator[(K,V)]] = {
-    AutoClose.autoClose(cache.query(new SqlQuery(valueClass, q)))(getEntries[K,V]).toOption
+    val sqlQuery: SqlQuery[K,V] = new SqlQuery(valueClass, q)
+    AutoClose.autoClose(cache.query(sqlQuery))(getEntries[K,V]).toOption
   }
 
-  def getEntries[K,V](cursor: QueryCursor[Cache.Entry[Nothing,Nothing]]): Iterator[(K,V)] = {
-    cursor.iterator().asScala.map{x =>
-      (x.getKey.asInstanceOf[K], x.getValue.asInstanceOf[V])
-    }
+  def getEntries[K,V](cursor: QueryCursor[Cache.Entry[K,V]]): Iterator[(K,V)] = {
+    cursor.iterator().asScala.map{x => (x.getKey, x.getValue)}
   }
 
   def sqlFieldsQuery[T](cache: IgniteCache[_,_], q: String): Option[Iterator[T]] = {

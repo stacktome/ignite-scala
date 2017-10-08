@@ -56,36 +56,45 @@ trait CacheBuilder[K,V] {
   val name: String
   val keyClass: Class[_]
   val valueClass: Class[_]
+  val cfgs: Seq[CacheConfigurator[K,V]] = Seq.empty
+
+  // Used for binary object storage
   val indexFields: Option[Seq[(String, Class[_])]] = None
   val fields: Option[Seq[(String, Class[_])]] = None
-  val cfgs: Seq[CacheConfigurator[K,V]] = Seq.empty
 
   def cacheConfiguration: CacheConfiguration[K,V] = {
     val cfg = new CacheConfiguration[K,V]()
     cfg.setName(name)
     cfg.setEagerTtl(false)
-    indexFields.foreach{x => cfg.setIndexedTypes(x.map(_._2).distinct:_*)}
-
-    cfg.setQueryEntities(queryEntities)
+    cfg.setIndexedTypes(keyClass, valueClass)
+    queryEntities.foreach(cfg.setQueryEntities)
     cfgs.foldLeft(cfg){(cfg,subCfg) => subCfg(cfg)}
   }
 
-  protected def queryIndex: java.util.Collection[QueryIndex] = {
-    indexFields.getOrElse(Seq.empty).map(t => new QueryIndex(t._1)).asJavaCollection
+  protected def queryIndex: Option[java.util.Collection[QueryIndex]] = {
+    indexFields.map(_.map(x => new QueryIndex(x._1)).asJavaCollection)
   }
 
-  protected def fieldMap: java.util.LinkedHashMap[String, String] = {
-    val m = new java.util.LinkedHashMap[String,String]()
-    fields.getOrElse(Seq.empty).foreach{t => m.put(t._1, t._2.getName)}
-    m
+  protected def fieldMap: Option[java.util.LinkedHashMap[String, String]] = {
+    if (fields.isDefined){
+      val m = new java.util.LinkedHashMap[String,String]()
+      fields.getOrElse(Seq.empty).foreach{t => m.put(t._1, t._2.getName)}
+      Some(m)
+    } else {
+      None
+    }
   }
 
-  protected def queryEntities: java.util.Collection[QueryEntity] = {
-    val q = new QueryEntity()
-    q.setKeyType(keyClass.getName)
-    q.setValueType(valueClass.getName)
-    q.setFields(fieldMap)
-    q.setIndexes(queryIndex)
-    Seq(q).asJavaCollection
+  protected def queryEntities: Option[java.util.Collection[QueryEntity]] = {
+    if (queryIndex.isDefined && fieldMap.isDefined) {
+      val q = new QueryEntity()
+      q.setKeyType(keyClass.getName)
+      q.setValueType(valueClass.getName)
+      fieldMap.foreach(q.setFields)
+      queryIndex.foreach(q.setIndexes)
+      Some(Seq(q).asJavaCollection)
+    } else {
+      None
+    }
   }
 }
