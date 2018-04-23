@@ -1,17 +1,17 @@
 package com.jasonmar.ignite
 
 import javax.cache.Cache
-
 import com.jasonmar.ignite.util.AutoClose
 import org.apache.ignite.IgniteCache
 import org.apache.ignite.cache.query.{SqlFieldsQuery, SqlQuery}
 
 import scala.collection.JavaConverters._
+import scala.reflect.ClassTag
 
 package object sql {
 
-  def sqlQuery[K,V](cache: IgniteCache[K,V], valueClass: Class[_], q: String): Option[Array[Cache.Entry[K,V]]] = {
-    val sqlQuery: SqlQuery[K,V] = new SqlQuery(valueClass, q)
+  def sqlQuery[K,V](cache: IgniteCache[K,V], q: String)(implicit tag: ClassTag[V]): Option[Array[Cache.Entry[K,V]]] = {
+    val sqlQuery: SqlQuery[K,V] = new SqlQuery(tag.runtimeClass, q)
     AutoClose.autoClose(cache.query(sqlQuery)){r =>
       r.iterator()
         .asScala
