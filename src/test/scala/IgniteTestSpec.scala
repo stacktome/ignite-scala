@@ -2,9 +2,12 @@ import com.jasonmar.ignite.config.IgniteClientConfig
 import com.jasonmar.ignite.sql.sqlQuery
 import com.jasonmar.ignite.util.AutoIncrementingIgniteCache
 import com.jasonmar.ignite.{CacheBuilder, exec}
+import org.apache.ignite.cache.query.SqlQuery
 import org.apache.ignite.cache.query.annotations.QuerySqlField
 import org.apache.ignite.{Ignite, IgniteCache}
 import org.scalatest.FlatSpec
+import scala.collection.JavaConverters._
+import javax.cache.Cache
 
 import scala.annotation.meta.field
 
@@ -38,6 +41,11 @@ class IgniteTestSpec extends FlatSpec {
       val res = sqlQuery(vCache.cache, "d > 10").getOrElse(Array()).map(_.getValue)
       assert(res.size == 2)
       assert(res.contains(Boo(d=30)))
+
+
+      val resWithArgs = sqlQuery(vCache.cache, "d > ?", 10).getOrElse(Array()).map(_.getValue)
+      assert(resWithArgs.size == 2)
+      assert(resWithArgs.contains(Boo(d=30)))
     })
   }
 }

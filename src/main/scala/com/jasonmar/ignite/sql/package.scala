@@ -10,8 +10,9 @@ import scala.reflect.ClassTag
 
 package object sql {
 
-  def sqlQuery[K,V](cache: IgniteCache[K,V], q: String)(implicit tag: ClassTag[V]): Option[Array[Cache.Entry[K,V]]] = {
+  def sqlQuery[K,V](cache: IgniteCache[K,V], q: String, args:Any*)(implicit tag: ClassTag[V]): Option[Array[Cache.Entry[K,V]]] = {
     val sqlQuery: SqlQuery[K,V] = new SqlQuery(tag.runtimeClass, q)
+    sqlQuery.setArgs(args.map(_.asInstanceOf[AnyRef]) : _*)
     AutoClose.autoClose(cache.query(sqlQuery)){r =>
       r.iterator()
         .asScala
