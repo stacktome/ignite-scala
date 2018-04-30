@@ -28,8 +28,8 @@ import scala.util.Failure
   */
 package object ignite {
 
-  trait CacheConfigurator[K,V] {
-    def apply(cfg: CacheConfiguration[K,V]): CacheConfiguration[K,V]
+  trait CacheConfigurator[K, V] {
+    def apply(cfg: CacheConfiguration[K, V]): CacheConfiguration[K, V]
   }
 
   trait IgniteConfigurator {
@@ -50,17 +50,21 @@ package object ignite {
     * @return initialized Ignite instance
     */
   def exec(
-    configs: Seq[IgniteConfigurator] = Seq.empty,
-    cacheBuilders: Seq[CacheBuilder[_,_]] = Seq.empty,
-    igniteFunction: Option[(Ignite => Unit)] = None,
-    activate: Boolean = false
+      configs: Seq[IgniteConfigurator] = Seq.empty,
+      cacheBuilders: Seq[CacheBuilder[_, _]] = Seq.empty,
+      igniteFunction: Option[(Ignite => Unit)] = None,
+      activate: Boolean = false
   ): Unit = {
-    val cfg = configs.foldLeft(new IgniteConfiguration()){(cfg, configurator) => configurator(cfg)}
+    val cfg = configs.foldLeft(new IgniteConfiguration()) { (cfg, configurator) =>
+      configurator(cfg)
+    }
     autoCloseWithShutdownHook(Ignition.start(cfg)) { ignite =>
       activateCluster(ignite, activate)
       Option(cacheBuilders.map(_.cacheConfiguration))
         .filter(_.nonEmpty)
-        .foreach{cfgs => ignite.getOrCreateCaches(cfgs.asJavaCollection)}
+        .foreach { cfgs =>
+          ignite.getOrCreateCaches(cfgs.asJavaCollection)
+        }
       igniteFunction.foreach(_.apply(ignite))
     } match {
       case Failure(e) =>
@@ -71,12 +75,12 @@ package object ignite {
   }
 
   def activateCluster(ignite: Ignite, activate: Boolean = true): Unit = {
-    if (!ignite.active()){
+    if (!ignite.active()) {
       ignite.log().warning("Ignite cluster is not active")
-      if (activate){
+      if (activate) {
         ignite.log().info("Activating Ignite cluster")
         ignite.active(true)
-        if (ignite.active()){
+        if (ignite.active()) {
           ignite.log().info("Ignite cluster is active")
         } else {
           ignite.log().error("Failed to activate Ignite cluster")
@@ -88,14 +92,19 @@ package object ignite {
   }
 
   def init(
-    configs: Option[Seq[IgniteConfigurator]] = None,
-    cacheBuilders: Option[Seq[CacheBuilder[_,_]]] = None,
-    igniteFunction: Option[(Ignite => Unit)] = None,
-    activate: Boolean = false
+      configs: Option[Seq[IgniteConfigurator]] = None,
+      cacheBuilders: Option[Seq[CacheBuilder[_, _]]] = None,
+      igniteFunction: Option[(Ignite => Unit)] = None,
+      activate: Boolean = false
   ): Ignite = {
     // Generate IgniteConfiguration
-    val cfg = configs.filter(_.nonEmpty)
-      .map{_.foldLeft(new IgniteConfiguration()){(cfg, configurator) => configurator(cfg)}}
+    val cfg = configs
+      .filter(_.nonEmpty)
+      .map {
+        _.foldLeft(new IgniteConfiguration()) { (cfg, configurator) =>
+          configurator(cfg)
+        }
+      }
       .getOrElse(new IgniteConfiguration())
 
     // Start Ignite instance
@@ -103,9 +112,10 @@ package object ignite {
     activateCluster(ignite, activate)
 
     // Create IgniteCaches
-    cacheBuilders.filter(_.nonEmpty)
+    cacheBuilders
+      .filter(_.nonEmpty)
       .map(_.map(_.cacheConfiguration).asJavaCollection)
-      .foreach(ignite.createCaches)
+      .foreach(ignite.getOrCreateCaches)
 
     // Apply IgniteFunctio
     igniteFunction.foreach(_.apply(ignite))

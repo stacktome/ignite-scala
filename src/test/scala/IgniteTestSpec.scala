@@ -1,3 +1,4 @@
+import com.jasonmar.ignite
 import com.jasonmar.ignite.config.IgniteClientConfig
 import com.jasonmar.ignite.sql._
 import com.jasonmar.ignite.util.AutoIncrementingIgniteCache
@@ -27,9 +28,10 @@ class IgniteTestSpec extends FlatSpec {
       val cache = mkCache[Long, Boo](ign)
       cache.clear()
       assertFunc(ign, AutoIncrementingIgniteCache(ign, cache))
-      cache.destroy()
+//      cache.destroy()
     }
     exec(Seq(config), cacheBuilders, Some(igniteFunc))
+//    ignite.init(Some(Seq(config)), Some(cacheBuilders), Some(igniteFunc), activate = false)
   }
 
   def mkCache[K, V](ignite: Ignite): IgniteCache[K, V] =
