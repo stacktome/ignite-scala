@@ -16,9 +16,12 @@
 
 package com.jasonmar.ignite.util
 
+import org.slf4j.{Logger, LoggerFactory}
+
 import scala.util.{Failure, Success, Try}
 
 object AutoClose {
+  lazy val logger: Logger = LoggerFactory.getLogger("ignite-scala AutoClose")
 
   /**
     * https://www.phdata.io/try-with-resources-in-scala/
@@ -34,6 +37,7 @@ object AutoClose {
       Success(f(resource))
     } catch {
       case e: Exception =>
+        logger.error("failed on success func", e) // should be logged
         Failure(e)
     } finally {
       try {
@@ -42,23 +46,23 @@ object AutoClose {
         }
       } catch {
         case e: Exception =>
-          println(e) // should be logged
+          logger.error("failed on when completing resource func", e) // should be logged
       }
     }
   }
 
-  def autoClose[A<:AutoCloseable, B](closeable: A)(f: A => B): Try[B] = {
+  def autoClose[A <: AutoCloseable, B](closeable: A)(f: A => B): Try[B] = {
     onComplete(closeable)(_.close())(f)
   }
 
   /** Useful for CLI applications
     *
     */
-  def autoCloseWithShutdownHook[A<:AutoCloseable, B](closeable: A)(f: A => B): Try[B] = {
-    Runtime.getRuntime.addShutdownHook(new Thread(){
+  def autoCloseWithShutdownHook[A <: AutoCloseable, B](closeable: A)(f: A => B): Try[B] = {
+    Runtime.getRuntime.addShutdownHook(new Thread() {
       override def run(): Unit = {
         try {
-          System.out.println("Closing")
+          logger.info("Closing")
           closeable.close()
         } catch {
           case e: InterruptedException =>

@@ -6,15 +6,18 @@ version := "1.7.2-SNAPSHOT"
 
 scalaVersion := "2.12.4"
 
-libraryDependencies += "org.apache.ignite" % "ignite-core" % "2.4.0"
+libraryDependencies ++= {
+  val igniteV       = "2.4.0"
+  Seq(
+    "org.apache.ignite" % "ignite-core" % igniteV,
+    "org.apache.ignite" % "ignite-urideploy" % igniteV,
+    "org.apache.ignite" % "ignite-indexing" % igniteV,
+    "com.github.scopt" %% "scopt" % "3.7.0",
+    "org.scalatest" %% "scalatest" % "3.0.4" % "test",
+    "ch.qos.logback" % "logback-classic" % "1.1.4"
+  )
+}
 
-libraryDependencies += "org.apache.ignite" % "ignite-urideploy" % "2.4.0"
-
-libraryDependencies += "org.apache.ignite" % "ignite-indexing" % "2.4.0"
-
-libraryDependencies += "com.github.scopt" %% "scopt" % "3.7.0"
-
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % "test"
 
 publishTo := {
   val nexus = "https://nexus.stacktome.com"
