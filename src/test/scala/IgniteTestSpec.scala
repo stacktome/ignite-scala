@@ -48,6 +48,11 @@ class IgniteTestSpec extends FlatSpec {
       val resWithArgs = sqlQuery(vCache.cache, "d > ?", 10).getOrElse(Array()).map(_.getValue)
       assert(resWithArgs.size == 2)
       assert(resWithArgs.contains(Boo(d = 30)))
+
+      val resWithSelect =
+        sqlQuery(vCache.cache, "select b.* from Boo b where b.d > 10").getOrElse(Array()).map(_.getValue)
+      assert(resWithSelect.size == 2)
+      assert(resWithSelect.contains(Boo(d = 30)))
     })
   }
 
