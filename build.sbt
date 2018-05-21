@@ -12,6 +12,7 @@ libraryDependencies ++= {
     "org.apache.ignite" % "ignite-core" % igniteV,
     "org.apache.ignite" % "ignite-urideploy" % igniteV,
     "org.apache.ignite" % "ignite-indexing" % igniteV,
+    "org.apache.ignite" % "ignite-kubernetes" % igniteV,
     "com.github.scopt" %% "scopt" % "3.7.0",
     "org.scalatest" %% "scalatest" % "3.0.4" % "test",
     "ch.qos.logback" % "logback-classic" % "1.1.4"

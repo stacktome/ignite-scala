@@ -96,16 +96,17 @@ object IgniteClientConfig {
   * @param activate default false, set true to activate cluster if currently inactive
   */
 case class IgniteClientConfig(
-  name: Option[String] = None,
-  bindAddress: String = "127.0.0.1",
-  commsPort: Option[Int] = None,
-  discoveryPort: Option[Int] = None,
-  portRange: Option[Int] = None,
-  workDirectory: String = "/tmp/ignite_client",
-  servers: Option[Seq[String]] = None,
-  peerClassLoading: Boolean = false,
-  metricsFrequency: Int = 0,
-  activate: Boolean = false
+    name: Option[String] = None,
+    bindAddress: String = "127.0.0.1",
+    commsPort: Option[Int] = None,
+    discoveryPort: Option[Int] = None,
+    portRange: Option[Int] = None,
+    workDirectory: String = "/tmp/ignite_client",
+    servers: Option[Seq[String]] = None,
+    kubeSvcName: Option[String] = None,
+    peerClassLoading: Boolean = false,
+    metricsFrequency: Int = 0,
+    activate: Boolean = false
 ) extends IgniteConfigurator {
   commsPort.foreach(port => require(port > 1000 && port <= 65535))
   discoveryPort.foreach(port => require(port > 1000 && port <= 65535))
@@ -119,12 +120,12 @@ case class IgniteClientConfig(
         workDirectory = Some(workDirectory)
       ),
       NetworkConfig(localHost = Some(bindAddress)),
-      networkSpi(name, bindAddress, servers, commsPort, discoveryPort, portRange),
+      networkSpi(name, bindAddress, servers, kubeSvcName, commsPort, discoveryPort, portRange),
       LoggingConfig(metricsLogFrequency = Some(metricsFrequency))
     )
   }
 
   override def apply(cfg: IgniteConfiguration): IgniteConfiguration = {
-    igniteConfigs.foldLeft(cfg)((a,b) => b.apply(a))
+    igniteConfigs.foldLeft(cfg)((a, b) => b.apply(a))
   }
 }

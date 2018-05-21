@@ -18,7 +18,12 @@ package com.jasonmar.ignite.config
 
 import com.jasonmar.ignite.IgniteConfigurator
 import com.jasonmar.ignite.config.grid._
-import org.apache.ignite.configuration.{IgniteConfiguration, MemoryConfiguration, MemoryPolicyConfiguration, PersistentStoreConfiguration}
+import org.apache.ignite.configuration.{
+  IgniteConfiguration,
+  MemoryConfiguration,
+  MemoryPolicyConfiguration,
+  PersistentStoreConfiguration
+}
 
 object IgniteServerConfig {
   def parse(args: Array[String]): Option[IgniteServerConfig] = parser.parse(args, IgniteServerConfig())
@@ -123,27 +128,28 @@ object IgniteServerConfig {
   * @param activate default false, whether to activate the cluster immediately
   */
 case class IgniteServerConfig(
-  name: Option[String] = None,
-  bindAddress: String = "127.0.0.1",
-  commsPort: Option[Int] = None,
-  discoveryPort: Option[Int] = None,
-  portRange: Option[Int] = None,
-  servers: Option[Seq[String]] = None,
-  deploymentUris: Seq[String] = Seq(),
-  userAttributes: Option[Map[String,String]] = None,
-  peerClassLoading: Boolean = false,
-  workDirectory: String = "/var/ignite",
-  metricsFrequency: Int = 0,
-  memMaxSizeGb: Long = 2 * 1024 * 1024 * 1024,
-  dataStreamerThreadPoolSize: Int = 16,
-  asyncCallbackPoolSize: Int = 16,
-  igfsThreadPoolSize: Int = 4,
-  queryThreadPoolSize: Int = 12,
-  persistentStoreEnabled: Boolean = true,
-  walFlushFrequency: Int = PersistentStoreConfiguration.DFLT_WAL_FLUSH_FREQ * 5,
-  checkpointingFrequency: Int = PersistentStoreConfiguration.DFLT_CHECKPOINTING_FREQ * 3,
-  walFsyncDelayNanos: Int = PersistentStoreConfiguration.DFLT_WAL_FSYNC_DELAY * 10,
-  activate: Boolean = false
+    name: Option[String] = None,
+    bindAddress: String = "127.0.0.1",
+    commsPort: Option[Int] = None,
+    discoveryPort: Option[Int] = None,
+    portRange: Option[Int] = None,
+    servers: Option[Seq[String]] = None,
+    kubeSvcName: Option[String] = None,
+    deploymentUris: Seq[String] = Seq(),
+    userAttributes: Option[Map[String, String]] = None,
+    peerClassLoading: Boolean = false,
+    workDirectory: String = "/var/ignite",
+    metricsFrequency: Int = 0,
+    memMaxSizeGb: Long = 2 * 1024 * 1024 * 1024,
+    dataStreamerThreadPoolSize: Int = 16,
+    asyncCallbackPoolSize: Int = 16,
+    igfsThreadPoolSize: Int = 4,
+    queryThreadPoolSize: Int = 12,
+    persistentStoreEnabled: Boolean = true,
+    walFlushFrequency: Int = PersistentStoreConfiguration.DFLT_WAL_FLUSH_FREQ * 5,
+    checkpointingFrequency: Int = PersistentStoreConfiguration.DFLT_CHECKPOINTING_FREQ * 3,
+    walFsyncDelayNanos: Int = PersistentStoreConfiguration.DFLT_WAL_FSYNC_DELAY * 10,
+    activate: Boolean = false
 ) extends IgniteConfigurator {
   val igniteConfigs: Seq[IgniteConfigurator] = Seq[IgniteConfigurator](
     GridConfig(
@@ -156,7 +162,8 @@ case class IgniteServerConfig(
     NetworkConfig(localHost = Some(bindAddress)),
     SubSystemConfig(
       persistentStoreConfiguration = {
-        if (persistentStoreEnabled) {Some(
+        if (persistentStoreEnabled) {
+          Some(
             PersistentStoreConfig(
               walFlushFrequency = Some(walFlushFrequency),
               checkpointingFrequency = Some(checkpointingFrequency),
@@ -176,17 +183,19 @@ case class IgniteServerConfig(
         )
       )
     ),
-    networkSpi(name, bindAddress, servers, commsPort, discoveryPort, portRange),
+    networkSpi(name, bindAddress, servers, kubeSvcName, commsPort, discoveryPort, portRange),
     ThreadPoolConfig(
       dataStreamerThreadPoolSize = Some(dataStreamerThreadPoolSize), // default 8
       asyncCallbackPoolSize = Some(asyncCallbackPoolSize), // default 8
-      igfsThreadPoolSize = Some(igfsThreadPoolSize),  // default # cores
+      igfsThreadPoolSize = Some(igfsThreadPoolSize), // default # cores
       queryThreadPoolSize = Some(queryThreadPoolSize) // default 8
     ),
     LoggingConfig(metricsLogFrequency = Some(metricsFrequency))
   )
 
   override def apply(cfg: IgniteConfiguration): IgniteConfiguration = {
-    igniteConfigs.foldLeft(cfg){ (a, b) => b.apply(a)}
+    igniteConfigs.foldLeft(cfg) { (a, b) =>
+      b.apply(a)
+    }
   }
 }
