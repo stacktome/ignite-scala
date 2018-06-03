@@ -22,7 +22,7 @@ class IgniteTestSpec extends FlatSpec {
 
   val NAME = "IgniteTest"
   def init(assertFunc: (Ignite, AutoIncrementingIgniteCache[Boo]) => Unit) = {
-    val config        = IgniteClientConfig(peerClassLoading = true)
+    val config        = IgniteClientConfig(peerClassLoading = true, servers = Some(List("127.0.0.1")))
     val cacheBuilders = Seq(CacheBuilder.ofClass(NAME, classOf[Boo]))
     def igniteFunc: Ignite => Unit = (ign: Ignite) => {
       val cache = mkCache[Long, Boo](ign)
@@ -79,6 +79,22 @@ class IgniteTestSpec extends FlatSpec {
                                                    _.toList.map(list => fromJavaBigDecimal(list.get(0))).head,
                                                    20)
       assert(resWithArgs.getOrElse(0) == 100)
+    })
+  }
+
+  "Boo " should " should support order by asc/desc" in {
+    init((ign, vCache) => {
+      vCache.put(Boo(d = 40))
+      vCache.put(Boo(d = 60))
+      vCache.put(Boo(d = 20))
+
+      val res = sqlQuery(vCache.cache, "select * from Boo order by d").getOrElse(Array()).map(_.getValue)
+      assert(res.head.d == 20)
+      assert(res.last.d == 60)
+
+      val res2 = sqlQuery(vCache.cache, "select * from Boo order by d desc").getOrElse(Array()).map(_.getValue)
+      assert(res2.head.d == 60)
+      assert(res2.last.d == 20)
     })
   }
 }
