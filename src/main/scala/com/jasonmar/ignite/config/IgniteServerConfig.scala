@@ -174,6 +174,7 @@ case class IgniteServerConfig(
           new DataRegionConfiguration()
             .setInitialSize(memMaxSizeGb / 2) // half max size
             .setMaxSize(memMaxSizeGb)
+            .setName(name.getOrElse(DataStorageConfiguration.DFLT_DATA_REG_DEFAULT_NAME))
             .setMetricsEnabled(false)
         )
       )
