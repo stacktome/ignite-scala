@@ -26,39 +26,38 @@ import org.apache.ignite.services.ServiceConfiguration
   *
   */
 case class SubSystemConfig(
-  atomicConfiguration: Option[AtomicConfiguration] = None, // atomicCfg
-  binaryConfiguration: Option[BinaryConfiguration] = None, // binaryCfg
-  cacheConfigurations: Option[Seq[CacheConfiguration[_,_]]] = None, // cacheCfg
-  cacheKeyConfigurations: Option[Seq[CacheKeyConfiguration]] = None, // cacheKeyCfg
-  connectorConfiguration: Option[ConnectorConfiguration] = None, // connectorCfg
-  executorConfigurations: Option[Seq[ExecutorConfiguration]] = None, // execCfgs
-  fileSystemConfigurations: Option[Seq[FileSystemConfiguration]] = None, // igfsCfg
-  hadoopConfiguration: Option[HadoopConfiguration] = None, // hadoopCfg
-  memoryConfiguration: Option[MemoryConfiguration] = None, // memCfg
-  //odbcConfiguration: Option[OdbcConfiguration] = None, // odbcCfg
-  persistentStoreConfiguration: Option[PersistentStoreConfiguration] = None, // pstCfg
-  platformConfiguration: Option[PlatformConfiguration] = None, // platformCfg
-  pluginConfigurations: Option[Seq[PluginConfiguration]] = None, // pluginCfgs
-  serviceConfigurations: Option[Seq[ServiceConfiguration]] = None, // svcCfgs
-  sqlConnectorConfiguration: Option[SqlConnectorConfiguration] = None, // sqlConnCfg
-  transactionConfiguration: Option[TransactionConfiguration] = None // txCfg
+    atomicConfiguration: Option[AtomicConfiguration] = None, // atomicCfg
+    binaryConfiguration: Option[BinaryConfiguration] = None, // binaryCfg
+    cacheConfigurations: Option[Seq[CacheConfiguration[_, _]]] = None, // cacheCfg
+    cacheKeyConfigurations: Option[Seq[CacheKeyConfiguration]] = None, // cacheKeyCfg
+    connectorConfiguration: Option[ConnectorConfiguration] = None, // connectorCfg
+    executorConfigurations: Option[Seq[ExecutorConfiguration]] = None, // execCfgs
+    fileSystemConfigurations: Option[Seq[FileSystemConfiguration]] = None, // igfsCfg
+    hadoopConfiguration: Option[HadoopConfiguration] = None,           // hadoopCfg
+    dataStorageConfiguration: Option[DataStorageConfiguration] = None, // memCfg
+    //odbcConfiguration: Option[OdbcConfiguration] = None, // odbcCfg
+    persistentStoreConfig: Option[DataStorageConfiguration] = None, // pstCfg
+    platformConfiguration: Option[PlatformConfiguration] = None, // platformCfg
+    pluginConfigurations: Option[Seq[PluginConfiguration]] = None, // pluginCfgs
+    serviceConfigurations: Option[Seq[ServiceConfiguration]] = None, // svcCfgs
+    sqlConnectorConfiguration: Option[SqlConnectorConfiguration] = None, // sqlConnCfg
+    transactionConfiguration: Option[TransactionConfiguration] = None // txCfg
 ) extends IgniteConfigurator {
   override def apply(cfg: IgniteConfiguration): IgniteConfiguration = {
     cacheConfigurations.foreach(s => s.foreach(c => cfg.setCacheConfiguration(c)))
-    cacheKeyConfigurations.foreach(cfg.setCacheKeyConfiguration(_:_*))
+    cacheKeyConfigurations.foreach(cfg.setCacheKeyConfiguration(_: _*))
     binaryConfiguration.foreach(cfg.setBinaryConfiguration)
-    memoryConfiguration.foreach(cfg.setMemoryConfiguration)
-    persistentStoreConfiguration.foreach(cfg.setPersistentStoreConfiguration)
-    fileSystemConfigurations.foreach(cfg.setFileSystemConfiguration(_:_*))
+    dataStorageConfiguration.foreach(cfg.setDataStorageConfiguration)
+    fileSystemConfigurations.foreach(cfg.setFileSystemConfiguration(_: _*))
     hadoopConfiguration.foreach(cfg.setHadoopConfiguration)
     connectorConfiguration.foreach(cfg.setConnectorConfiguration)
     //odbcConfiguration.foreach(cfg.setOdbcConfiguration)
-    serviceConfigurations.foreach(cfg.setServiceConfiguration(_:_*))
+    serviceConfigurations.foreach(cfg.setServiceConfiguration(_: _*))
     transactionConfiguration.foreach(cfg.setTransactionConfiguration)
-    pluginConfigurations.foreach(cfg.setPluginConfigurations(_:_*))
+    pluginConfigurations.foreach(cfg.setPluginConfigurations(_: _*))
     atomicConfiguration.foreach(cfg.setAtomicConfiguration)
     platformConfiguration.foreach(cfg.setPlatformConfiguration)
-    executorConfigurations.foreach(cfg.setExecutorConfiguration(_:_*))
+    executorConfigurations.foreach(cfg.setExecutorConfiguration(_: _*))
     sqlConnectorConfiguration.foreach(cfg.setSqlConnectorConfiguration)
     cfg
   }

@@ -97,7 +97,7 @@ object IgniteClientConfig {
   */
 case class IgniteClientConfig(
     name: Option[String] = None,
-    bindAddress: String = "127.0.0.1",
+    bindAddress: String = "0.0.0.0",
     commsPort: Option[Int] = None,
     discoveryPort: Option[Int] = None,
     portRange: Option[Int] = None,

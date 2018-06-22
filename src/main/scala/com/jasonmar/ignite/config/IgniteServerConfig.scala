@@ -18,18 +18,13 @@ package com.jasonmar.ignite.config
 
 import com.jasonmar.ignite.IgniteConfigurator
 import com.jasonmar.ignite.config.grid._
-import org.apache.ignite.configuration.{
-  IgniteConfiguration,
-  MemoryConfiguration,
-  MemoryPolicyConfiguration,
-  PersistentStoreConfiguration
-}
+import org.apache.ignite.configuration._
 
 object IgniteServerConfig {
   def parse(args: Array[String]): Option[IgniteServerConfig] = parser.parse(args, IgniteServerConfig())
   def parser: scopt.OptionParser[IgniteServerConfig] = {
     new scopt.OptionParser[IgniteServerConfig]("ignite") {
-      head("ignite", "2.2")
+      head("ignite", "2.4")
 
       opt[String]('n', "name")
         .valueName("<name>")
@@ -138,7 +133,7 @@ case class IgniteServerConfig(
     deploymentUris: Seq[String] = Seq(),
     userAttributes: Option[Map[String, String]] = None,
     peerClassLoading: Boolean = false,
-    workDirectory: String = "/var/ignite",
+    workDirectory: String = "/tmp/ignite_server",
     metricsFrequency: Int = 0,
     memMaxSizeGb: Long = 2 * 1024 * 1024 * 1024,
     dataStreamerThreadPoolSize: Int = 16,
@@ -146,9 +141,9 @@ case class IgniteServerConfig(
     igfsThreadPoolSize: Int = 4,
     queryThreadPoolSize: Int = 12,
     persistentStoreEnabled: Boolean = true,
-    walFlushFrequency: Int = PersistentStoreConfiguration.DFLT_WAL_FLUSH_FREQ * 5,
-    checkpointingFrequency: Int = PersistentStoreConfiguration.DFLT_CHECKPOINTING_FREQ * 3,
-    walFsyncDelayNanos: Int = PersistentStoreConfiguration.DFLT_WAL_FSYNC_DELAY * 10,
+    walFlushFrequency: Int = DataStorageConfiguration.DFLT_WAL_FLUSH_FREQ * 5,
+    checkpointingFrequency: Int = DataStorageConfiguration.DFLT_CHECKPOINT_FREQ * 3,
+    walFsyncDelayNanos: Int = DataStorageConfiguration.DFLT_WAL_FSYNC_DELAY * 10,
     activate: Boolean = false
 ) extends IgniteConfigurator {
   val igniteConfigs: Seq[IgniteConfigurator] = Seq[IgniteConfigurator](
@@ -161,7 +156,7 @@ case class IgniteServerConfig(
     ),
     NetworkConfig(localHost = Some(bindAddress)),
     SubSystemConfig(
-      persistentStoreConfiguration = {
+      persistentStoreConfig = {
         if (persistentStoreEnabled) {
           Some(
             PersistentStoreConfig(
@@ -174,10 +169,10 @@ case class IgniteServerConfig(
           None
         }
       },
-      memoryConfiguration = Some(
-        new MemoryConfiguration().setMemoryPolicies(
-          new MemoryPolicyConfiguration()
-            .setInitialSize(MemoryConfiguration.DFLT_MEMORY_POLICY_INITIAL_SIZE * 10L) // 2g
+      dataStorageConfiguration = Some(
+        new DataStorageConfiguration().setDataRegionConfigurations(
+          new DataRegionConfiguration()
+            .setInitialSize(memMaxSizeGb / 2) // half max size
             .setMaxSize(memMaxSizeGb)
             .setMetricsEnabled(false)
         )
