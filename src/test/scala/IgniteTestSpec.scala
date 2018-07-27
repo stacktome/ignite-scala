@@ -109,6 +109,9 @@ class IgniteTestSpec extends FlatSpec {
         val cacheF = AutoIncrementingIgniteCache(ign, mkCache[Long, Foo](ign, NAME2))
         val cacheAF = mkCache[AffinityKey[Long], Boo](ign, NAME3)
 
+        cacheF.cache.clear()
+        cacheAF.clear()
+
         cacheF.put(Foo(name = "first", 1))
         vCache.put(Boo(d = 20, 1))
         cacheAF.put(new AffinityKey[Long](1, 1), Boo(d = 20, 1))
@@ -120,9 +123,9 @@ class IgniteTestSpec extends FlatSpec {
         assert(res2.last.name == "first")
 
         val res3 = sqlQuery(cacheAF,
-          s"""select * from Boo AS b, "$NAME3".Foo AS f
-              where b.fooId = f.id and f.name = ?
-              order by name desc""", "first").getOrElse(Array()).map(_.getValue)
+          s"""select b.* from Boo b, "$NAME2".Foo AS f
+              where fooId = f.id and f.name = 'first'
+              order by d desc""").getOrElse(Array()).map(_.getValue)
         assert(res3.last.d == 20)
       },
       Some(Seq(CacheBuilder.ofClass(NAME, classOf[Boo]),
@@ -133,5 +136,7 @@ class IgniteTestSpec extends FlatSpec {
   }
 }
 
-case class Boo(@(QuerySqlField @field)(index = true) d: Int, @(QuerySqlField @field)(index = true) fooId)
-case class Foo(@(QuerySqlField @field)(index = true) name: String, @(QuerySqlField @field)(index = true) id)
+case class Boo(@(QuerySqlField @field)(index = true) d: Int,
+               @(QuerySqlField @field)(index = true) fooId: Long)
+case class Foo(@(QuerySqlField @field)(index = true) name: String,
+               @(QuerySqlField @field)(index = true) id: Long)
