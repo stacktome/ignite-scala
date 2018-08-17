@@ -130,6 +130,7 @@ case class IgniteServerConfig(
     portRange: Option[Int] = None,
     servers: Option[Seq[String]] = None,
     kubeSvcName: Option[String] = None,
+    kubeNamespace: Option[String] = None,
     deploymentUris: Seq[String] = Seq(),
     userAttributes: Option[Map[String, String]] = None,
     peerClassLoading: Boolean = false,
@@ -179,7 +180,7 @@ case class IgniteServerConfig(
         )
       )
     ),
-    networkSpi(name, bindAddress, servers, kubeSvcName, commsPort, discoveryPort, portRange),
+    networkSpi(name, bindAddress, servers, kubeSvcName, kubeNamespace, commsPort, discoveryPort, portRange),
     ThreadPoolConfig(
       dataStreamerThreadPoolSize = Some(dataStreamerThreadPoolSize), // default 8
       asyncCallbackPoolSize = Some(asyncCallbackPoolSize), // default 8

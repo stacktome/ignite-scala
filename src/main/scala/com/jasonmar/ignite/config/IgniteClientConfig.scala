@@ -104,6 +104,7 @@ case class IgniteClientConfig(
     workDirectory: String = "/tmp/ignite_client",
     servers: Option[Seq[String]] = None,
     kubeSvcName: Option[String] = None,
+    kubeNamespace: Option[String] = None,
     peerClassLoading: Boolean = false,
     metricsFrequency: Int = 0,
     activate: Boolean = false
@@ -120,7 +121,7 @@ case class IgniteClientConfig(
         workDirectory = Some(workDirectory)
       ),
       NetworkConfig(localHost = Some(bindAddress)),
-      networkSpi(name, bindAddress, servers, kubeSvcName, commsPort, discoveryPort, portRange),
+      networkSpi(name, bindAddress, servers, kubeSvcName, kubeNamespace, commsPort, discoveryPort, portRange),
       LoggingConfig(metricsLogFrequency = Some(metricsFrequency))
     )
   }

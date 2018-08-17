@@ -15,6 +15,7 @@ package object config {
                  bindAddress: String,
                  servers: Option[Seq[String]],
                  kubeServiceName: Option[String],
+                 kubeNamespace: Option[String],
                  commsPort: Option[Int],
                  discoveryPort: Option[Int],
                  portRange: Option[Int]): SpiConfig = {
@@ -33,6 +34,7 @@ package object config {
             new TcpDiscoverySpi().setIpFinder {
               val finder = new TcpDiscoveryKubernetesIpFinder()
               finder.setServiceName(sn)
+              finder.setNamespace(kubeNamespace.getOrElse("default"))
               finder
             }
           case (Some(_), Some(_)) => throw new IgniteException("wrong config - choose either servers or kube")
