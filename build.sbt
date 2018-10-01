@@ -7,7 +7,7 @@ version := "1.7.2-SNAPSHOT"
 scalaVersion := "2.12.4"
 
 libraryDependencies ++= {
-  val igniteV       = "2.4.0"
+  val igniteV       = "2.6.0"
   Seq(
     "org.apache.ignite" % "ignite-core" % igniteV,
     "org.apache.ignite" % "ignite-urideploy" % igniteV,
