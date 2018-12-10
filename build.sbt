@@ -1,3 +1,6 @@
+import sbt._
+import sbt.Keys._
+
 name := "ignite-scala"
 
 organization := "com.jasonmar"
@@ -20,6 +23,7 @@ libraryDependencies ++= {
 }
 
 
+updateOptions := updateOptions.value.withGigahorse(false)
 publishTo := {
   val nexus = "https://nexus.stacktome.com"
 
