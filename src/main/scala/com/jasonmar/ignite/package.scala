@@ -17,11 +17,15 @@
 package com.jasonmar
 
 import com.jasonmar.ignite.util.AutoClose.autoCloseWithShutdownHook
+import org.apache.ignite.client.IgniteClient
 import org.apache.ignite.{Ignite, Ignition}
-import org.apache.ignite.configuration.{CacheConfiguration, IgniteConfiguration}
+import org.apache.ignite.configuration.{CacheConfiguration, ClientConfiguration, IgniteConfiguration}
 
 import scala.collection.JavaConverters.asJavaCollectionConverter
-import scala.util.Failure
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.{Failure, Try}
+import org.apache.ignite.client.IgniteClient
+import org.slf4j.LoggerFactory
 
 /** Executable command-line application
   * Starts a production-ready Ignite server node
@@ -39,6 +43,7 @@ package object ignite {
   trait IgniteFunction {
     val igniteFunction: (Ignite) => Unit
   }
+  val log = LoggerFactory.getLogger(this.getClass.getName)
 
   /** Initializes Ignite instance with configurations
     * Creates caches
@@ -121,6 +126,29 @@ package object ignite {
     igniteFunction.foreach(_.apply(ignite))
 
     ignite
+  }
+
+  def initClient(adr: String, retry: Int = 0, ports: List[String] = List("10800", "10801", "10802"))(
+      implicit ec: ExecutionContext): Option[org.apache.ignite.client.IgniteClient] = {
+    import scala.concurrent.duration._
+    val res = Try(Await.result(Future {
+      Ignition.startClient(new ClientConfiguration().setTimeout(1000).setAddresses(s"$adr:${ports.head}"))
+    }, 20.seconds))
+    val client = res match {
+      case scala.util.Success(client) => {
+        log.info(s"connected to: $adr")
+        Some(client)
+      }
+      case scala.util.Failure(exp) => {
+        log.error(s"client could not connect ${exp} retry: $retry")
+        None
+      }
+    }
+    if (client.isEmpty && retry < 10) {
+      Thread.sleep(1000L * (retry + 1))
+      initClient(adr, retry + 1, if (ports.size > 0) ports.tail else List("10800", "10801", "10802"))
+    } else
+      client
   }
 
 }
