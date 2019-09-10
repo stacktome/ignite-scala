@@ -67,6 +67,7 @@ trait CacheBuilder[K,V] {
     cfg.setName(name)
     cfg.setEagerTtl(false)
     cfg.setIndexedTypes(keyClass, valueClass)
+    cfg.setBackups(1) // have at least 1 backup
     queryEntities.foreach(cfg.setQueryEntities)
     cfgs.foldLeft(cfg){(cfg,subCfg) => subCfg(cfg)}
   }

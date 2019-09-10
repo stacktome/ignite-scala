@@ -1,13 +1,16 @@
+import sbt._
+import sbt.Keys._
+
 name := "ignite-scala"
 
 organization := "com.jasonmar"
 
 version := "1.7.2-SNAPSHOT"
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.8"
 
 libraryDependencies ++= {
-  val igniteV       = "2.6.0"
+  val igniteV       = "2.7.0"
   Seq(
     "org.apache.ignite" % "ignite-core" % igniteV,
     "org.apache.ignite" % "ignite-urideploy" % igniteV,
@@ -20,6 +23,7 @@ libraryDependencies ++= {
 }
 
 
+updateOptions := updateOptions.value.withGigahorse(false)
 publishTo := {
   val nexus = "https://nexus.stacktome.com"
 

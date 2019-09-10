@@ -17,7 +17,7 @@ import scala.annotation.meta.field
 /**
   * Created by evaldas on 12/27/16.
   */
-class IgniteClientTestSpec extends FlatSpec {
+class IgniteTestSpec extends FlatSpec {
 
   lazy val logger = LoggerFactory.getLogger(classOf[IgniteTestSpec])
 
