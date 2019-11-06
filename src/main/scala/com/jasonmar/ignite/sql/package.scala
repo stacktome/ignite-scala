@@ -8,11 +8,12 @@ import org.apache.ignite.client.ClientCache
 
 import scala.collection.JavaConverters._
 import scala.reflect.ClassTag
+import scala.util.Try
 
 package object sql {
 
   def sqlQuery[K, V](cache: IgniteCache[K, V], q: String, args: Any*)(
-      implicit tag: ClassTag[V]): Option[Array[Cache.Entry[K, V]]] = {
+      implicit tag: ClassTag[V]): Try[Array[Cache.Entry[K, V]]] = {
 
     val sqlQuery: SqlQuery[K, V] = new SqlQuery(tag.runtimeClass, q)
     sqlQuery.setArgs(args.map(_.asInstanceOf[AnyRef]): _*)
@@ -20,11 +21,10 @@ package object sql {
       .autoClose(cache.query(sqlQuery)) { r =>
         r.iterator().asScala.toArray
       }
-      .toOption
   }
 
   def sqlQueryClient[K, V](cache: ClientCache[K, V], q: String, args: Any*)(
-    implicit tag: ClassTag[V]): Option[Array[Cache.Entry[K, V]]] = {
+      implicit tag: ClassTag[V]): Try[Array[Cache.Entry[K, V]]] = {
 
     val sqlQuery: SqlQuery[K, V] = new SqlQuery(tag.runtimeClass, q)
     sqlQuery.setArgs(args.map(_.asInstanceOf[AnyRef]): _*)
@@ -32,7 +32,6 @@ package object sql {
       .autoClose(cache.query(sqlQuery)) { r =>
         r.iterator().asScala.toArray
       }
-      .toOption
   }
 
   /** Provides a wrapper around SqlFieldsQuery which automatically closes the cursor after transforming the result set
@@ -46,7 +45,7 @@ package object sql {
   def sqlFieldsQuery[T](cache: IgniteCache[_, _],
                         q: String,
                         f: (Iterator[java.util.List[_]]) => T,
-                        args: Any*): Option[T] = {
+                        args: Any*): Try[T] = {
 
     val sqlFieldQuery = new SqlFieldsQuery(q)
     sqlFieldQuery.setArgs(args.map(_.asInstanceOf[AnyRef]): _*)
@@ -54,7 +53,6 @@ package object sql {
       .autoClose(cache.query(sqlFieldQuery)) { r =>
         f(r.iterator().asScala)
       }
-      .toOption
   }
 
   /** Provides a wrapper around SqlFieldsQuery which automatically closes the cursor after transforming the result set
@@ -66,9 +64,9 @@ package object sql {
     * @return
     */
   def sqlFieldsClientQuery[T](cache: ClientCache[_, _],
-                        q: String,
-                        f: (Iterator[java.util.List[_]]) => T,
-                        args: Any*): Option[T] = {
+                              q: String,
+                              f: (Iterator[java.util.List[_]]) => T,
+                              args: Any*): Try[T] = {
 
     val sqlFieldQuery = new SqlFieldsQuery(q)
     sqlFieldQuery.setArgs(args.map(_.asInstanceOf[AnyRef]): _*)
@@ -76,6 +74,5 @@ package object sql {
       .autoClose(cache.query(sqlFieldQuery)) { r =>
         f(r.iterator().asScala)
       }
-      .toOption
   }
 }
