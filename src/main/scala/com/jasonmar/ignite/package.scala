@@ -132,7 +132,7 @@ package object ignite {
       implicit ec: ExecutionContext): Option[org.apache.ignite.client.IgniteClient] = {
     import scala.concurrent.duration._
     val res = Try(Await.result(Future {
-      Ignition.startClient(new ClientConfiguration().setTimeout(1000).setAddresses(s"$adr:${ports.head}"))
+      Ignition.startClient(new ClientConfiguration().setTimeout(30000).setAddresses(s"$adr:${ports.head}"))
     }, 20.seconds))
     val client = res match {
       case scala.util.Success(client) => {
