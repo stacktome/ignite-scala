@@ -28,10 +28,7 @@ package object sql {
 
     val sqlQuery: SqlQuery[K, V] = new SqlQuery(tag.runtimeClass, q)
     sqlQuery.setArgs(args.map(_.asInstanceOf[AnyRef]): _*)
-    AutoClose
-      .autoClose(cache.query(sqlQuery)) { r =>
-        r.iterator().asScala.toArray
-      }
+    Try(cache.query(sqlQuery).getAll.asScala.toArray)
   }
 
   /** Provides a wrapper around SqlFieldsQuery which automatically closes the cursor after transforming the result set
