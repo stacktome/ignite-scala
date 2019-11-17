@@ -5,7 +5,7 @@ name := "ignite-scala"
 
 organization := "com.jasonmar"
 
-version := "1.7.3-SNAPSHOT"
+version := "1.7.4-SNAPSHOT"
 
 scalaVersion := "2.12.8"
 
