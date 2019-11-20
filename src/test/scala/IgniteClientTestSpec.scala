@@ -1,20 +1,16 @@
-import com.jasonmar.ignite
 import com.jasonmar.ignite.config.IgniteClientConfig
 import com.jasonmar.ignite.sql._
+import com.jasonmar.ignite.text._
 import com.jasonmar.ignite.util.{AutoIncrementingClientCache, AutoIncrementingIgniteCache}
 import com.jasonmar.ignite.{CacheBuilder, exec, initClient}
-import org.apache.ignite.cache.query.annotations.QuerySqlField
 import org.apache.ignite.{Ignite, IgniteCache}
 import org.scalatest.FlatSpec
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.collection.JavaConverters._
-import javax.cache.Cache
 import org.apache.ignite.cache.affinity.AffinityKey
 import org.apache.ignite.client.{ClientCache, IgniteClient}
 import org.slf4j.LoggerFactory
-
-import scala.annotation.meta.field
 
 /**
   * Created by evaldas on 12/27/16.
@@ -26,6 +22,7 @@ class IgniteClientTestSpec extends FlatSpec {
   val NAME  = "IgniteTest"
   val NAME2 = "IgniteTest2"
   val NAME3 = "IgniteTest3"
+  val NAME4 = "IgniteTest4"
   def init(assertFunc: (IgniteClient, AutoIncrementingClientCache[Boo], Ignite) => Unit,
            customBuilders: Option[Seq[CacheBuilder[_, _]]] = None) = {
     val config        = IgniteClientConfig(peerClassLoading = true, servers = Some(List("127.0.0.1")))
@@ -139,4 +136,27 @@ class IgniteClientTestSpec extends FlatSpec {
         ))
     )
   }
+
+  "Foo " should " should support text query" in {
+    init(
+      (ign, vCache, ignFull) => {
+
+        val cacheF = mkCache[Long, Foo](ign, NAME4)
+        cacheF.clear()
+
+        cacheF.put(1, Foo(name = "first", 1, "good foo"))
+        cacheF.put(2, Foo(name = "second", 2, "bad foo"))
+
+        val res = textClientQuery[Long, Foo](cacheF, "bad").getOrElse(Array()).map(_.getValue)
+        assert(res.size == 1)
+        assert(res == Foo(name = "second", 2, "bad foo"))
+
+      },
+      Some(
+        Seq(
+          CacheBuilder.ofClass(NAME4, classOf[Foo])
+        ))
+    )
+  }
+
 }
