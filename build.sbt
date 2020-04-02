@@ -22,7 +22,6 @@ libraryDependencies ++= {
   )
 }
 
-
 updateOptions := updateOptions.value.withGigahorse(false)
 publishTo := {
   val nexus = "https://nexus.stacktome.com"
