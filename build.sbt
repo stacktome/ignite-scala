@@ -5,12 +5,12 @@ name := "ignite-scala"
 
 organization := "com.jasonmar"
 
-version := "1.7.4-SNAPSHOT"
+version := "1.7.5-SNAPSHOT"
 
 scalaVersion := "2.12.8"
 
 libraryDependencies ++= {
-  val igniteV       = "2.7.0"
+  val igniteV       = "2.8.0"
   Seq(
     "org.apache.ignite" % "ignite-core" % igniteV,
     "org.apache.ignite" % "ignite-urideploy" % igniteV,
@@ -21,7 +21,6 @@ libraryDependencies ++= {
     "ch.qos.logback" % "logback-classic" % "1.1.4"
   )
 }
-
 
 updateOptions := updateOptions.value.withGigahorse(false)
 publishTo := {

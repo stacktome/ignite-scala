@@ -25,7 +25,7 @@ class IgniteClientTestSpec extends FlatSpec {
   val NAME4 = "IgniteTest4"
   def init(assertFunc: (IgniteClient, AutoIncrementingClientCache[Boo], Ignite) => Unit,
            customBuilders: Option[Seq[CacheBuilder[_, _]]] = None) = {
-    val config        = IgniteClientConfig(peerClassLoading = true, servers = Some(List("127.0.0.1")))
+    val config        = IgniteClientConfig(peerClassLoading = true, servers = Some(List("localhost")))
     val cacheBuilders = customBuilders.getOrElse(Seq(CacheBuilder.ofClass(NAME, classOf[Boo])))
     def igniteFunc: Ignite => Unit = (ign: Ignite) => {
       val ignClient = initClient(config.servers.get.head).get
@@ -70,7 +70,7 @@ class IgniteClientTestSpec extends FlatSpec {
       vCache.put(Boo(d = 40))
       vCache.put(Boo(d = 60))
       vCache.put(Boo(d = 20))
-      def fromJavaBigDecimal(v: Any) = BigDecimal(v.asInstanceOf[java.math.BigDecimal])
+      def fromJavaBigDecimal(v: Any) = BigDecimal(v.asInstanceOf[Long])
       val res =
         sqlFieldsClientQuery[BigDecimal](vCache.cache,
                                          "select sum(d) from Boo",
