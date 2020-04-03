@@ -25,7 +25,7 @@ class IgniteClientTestSpec extends FlatSpec {
   val NAME4 = "IgniteTest4"
   def init(assertFunc: (IgniteClient, AutoIncrementingClientCache[Boo], Ignite) => Unit,
            customBuilders: Option[Seq[CacheBuilder[_, _]]] = None) = {
-    val config        = IgniteClientConfig(peerClassLoading = true, servers = Some(List("ignite")))
+    val config        = IgniteClientConfig(peerClassLoading = true, servers = Some(List("localhost")))
     val cacheBuilders = customBuilders.getOrElse(Seq(CacheBuilder.ofClass(NAME, classOf[Boo])))
     def igniteFunc: Ignite => Unit = (ign: Ignite) => {
       val ignClient = initClient(config.servers.get.head).get
