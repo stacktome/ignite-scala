@@ -148,11 +148,17 @@ class IgniteTestSpec extends FlatSpec {
 
         cacheF.put(1, Foo(name = "first", 1, "good foo"))
         cacheF.put(2, Foo(name = "second", 2, "bad foo"))
+        cacheF.put(3, Foo(name = "third", 3, "test foo"))
 
-        val res = textQuery[Long, Foo](cacheF, "bad").getOrElse(Array()).map(_.getValue)
+        val res = textQuery[Long, Foo](cacheF, "bad", 1).getOrElse(Array()).map(_.getValue)
         assert(res.size == 1)
         assert(res.head == Foo(name = "second", 2, "bad foo"))
 
+        val res2 = textQuery[Long, Foo](cacheF, "foo", 3).getOrElse(Array()).map(_.getValue)
+        assert(res2.size == 3)
+
+        val res3 = textQuery[Long, Foo](cacheF, "foo", 2).getOrElse(Array()).map(_.getValue)
+        assert(res3.size == 2)
       },
       Some(
         Seq(
