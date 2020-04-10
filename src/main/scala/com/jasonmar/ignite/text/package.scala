@@ -30,8 +30,9 @@ package object text {
     * @param q Ignite SQL Query
     * @return
     */
-  def textQuery[K, V](cache: IgniteCache[_, _], q: String)(implicit tag: ClassTag[V]): Try[Array[Cache.Entry[K, V]]] = {
-    val txtQuery: TextQuery[K, V] = new TextQuery(tag.runtimeClass, q)
+  def textQuery[K, V](cache: IgniteCache[_, _], q: String, limit: Int)(
+      implicit tag: ClassTag[V]): Try[Array[Cache.Entry[K, V]]] = {
+    val txtQuery: TextQuery[K, V] = new TextQuery(tag.runtimeClass, q, limit)
     Try(cache.query(txtQuery).getAll.asScala.toArray)
   }
 }
