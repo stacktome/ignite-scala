@@ -140,13 +140,13 @@ package object ignite {
         Some(client)
       }
       case scala.util.Failure(exp) => {
-        log.error(s"client could not connect ${exp} retry: $retry")
+        log.warn(s"client could not connect ${exp} retry: $retry")
         None
       }
     }
     if (client.isEmpty && retry < 10) {
       Thread.sleep(1000L * (retry + 1))
-      initClient(adr, retry + 1, if (ports.size > 0) ports.tail else List("10800", "10801", "10802"))
+      initClient(adr, retry + 1, if (ports.size > 1) ports.tail else List("10800", "10801", "10802"))
     } else
       client
   }
