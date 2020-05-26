@@ -68,6 +68,7 @@ trait CacheBuilder[K,V] {
     cfg.setEagerTtl(false)
     cfg.setIndexedTypes(keyClass, valueClass)
     cfg.setBackups(1) // have at least 1 backup
+    cfg.setSqlFunctionClasses(classOf[com.stacktome.customsqlfunc.CustomSqlFunc])
     queryEntities.foreach(cfg.setQueryEntities)
     cfgs.foldLeft(cfg){(cfg,subCfg) => subCfg(cfg)}
   }
